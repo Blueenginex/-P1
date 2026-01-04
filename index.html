@@ -2,50 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Journal</title>
     <style>
-        :root { --blue: #3498db; --bg: #0b0f19; --card: #1e293b; --sel-bg: rgba(52, 152, 219, 0.3); }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; overflow: hidden; user-select: none; }
+        :root { 
+            --blue: #3498db; 
+            --bg: #0b0f19; 
+            --card: #202c33; /* Darker modern grey */
+            --sel-bg: rgba(52, 152, 219, 0.2); 
+            --whatsapp-green: #00a884; 
+            --text-main: #e9edef;
+            --text-dim: #8696a0;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            overflow: hidden; 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+        }
 
-        /* Snow & Lights */
+        /* Snow */
         #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-        .snowflake { position: absolute; top: -10px; color: white; animation: fall linear infinite; }
+        .snowflake { position: absolute; top: -10px; color: white; animation: fall linear infinite; opacity: 0.5; }
         @keyframes fall { to { transform: translateY(105vh) translateX(20px); } }
         
-        /* Selection Header (WhatsApp Style) */
+        /* Selection Header */
         #selectionHeader { 
             position: fixed; top: 0; width: 100%; height: 60px; background: #1f2c33; 
             display: none; align-items: center; justify-content: space-between; 
             padding: 0 20px; box-sizing: border-box; z-index: 300; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* Logout & Icons */
-        #circLogout { display: none; position: fixed; top: 15px; right: 15px; width: 40px; height: 40px; border-radius: 50%; background: rgba(51, 65, 85, 0.9); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer; z-index: 200; align-items: center; justify-content: center; }
+        #circLogout { display: none; position: fixed; top: 10px; right: 15px; width: 40px; height: 40px; border-radius: 50%; background: rgba(51, 65, 85, 0.9); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer; z-index: 200; align-items: center; justify-content: center; }
 
         /* Chat Area */
-        #displayArea { height: calc(100vh - 85px); overflow-y: auto; padding: 60px 15px 10px 15px; max-width: 600px; margin: auto; box-sizing: border-box; display: flex; flex-direction: column; }
-        .entry { align-self: flex-start; width: 100%; margin-bottom: 8px; transition: 0.2s; }
+        #displayArea { height: calc(100vh - 70px); overflow-y: auto; padding: 70px 15px 80px 15px; max-width: 600px; margin: auto; box-sizing: border-box; display: flex; flex-direction: column; scroll-behavior: smooth; position: relative; z-index: 1; }
+        
+        /* Clean Text Bubble Design */
+        .entry { align-self: flex-start; width: 100%; margin-bottom: 12px; transition: 0.2s; }
+        
         .msg-card { 
-            max-width: 85%; background: var(--card); padding: 8px 12px; border-radius: 0 15px 15px 15px; 
-            font-size: 15px; border-left: 3px solid var(--blue); position: relative; word-wrap: break-word; 
+            max-width: 85%; 
+            background: var(--card); 
+            padding: 12px 16px; 
+            border-radius: 18px; /* High rounding for modern look */
+            font-size: 15px; 
+            position: relative; 
+            word-wrap: break-word; 
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
-        /* Selection Effect */
-        .selected { background: var(--sel-bg) !important; }
-        .selected .msg-card { background: #2b394d; }
+        .selected .msg-card { 
+            background: #374151 !important; 
+            box-shadow: 0 0 0 2px var(--blue);
+        }
 
-        .msg-info { display: block; font-size: 9px; color: #94a3b8; text-align: right; margin-top: 4px; }
+        .msg-info { 
+            display: block; 
+            font-size: 10.5px; 
+            color: var(--text-dim); 
+            text-align: right; 
+            margin-top: 5px; 
+        }
 
         /* Bottom Input Bar */
-        #inputSection { position: fixed; bottom: 0; width: 100%; background: #161e2d; border-top: 1px solid #2d3748; padding: 10px 15px; box-sizing: border-box; z-index: 101; display: none; }
-        .chat-container { max-width: 600px; margin: auto; display: flex; align-items: center; gap: 8px; }
-        textarea { flex-grow: 1; height: 40px; padding: 10px 15px; border-radius: 20px; border: 1px solid #334155; background: #0b0f19; color: white; outline: none; resize: none; }
-        .send-btn { background: var(--blue); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        #inputSection { position: fixed; bottom: 0; width: 100%; background: var(--bg); padding: 10px; box-sizing: border-box; z-index: 101; display: none; }
+        .chat-container { max-width: 600px; margin: auto; display: flex; align-items: flex-end; gap: 8px; }
+        
+        .input-wrapper { flex-grow: 1; background: #2a3942; border-radius: 25px; display: flex; align-items: flex-end; padding: 5px 15px; min-height: 45px; box-sizing: border-box; }
+        
+        textarea { 
+            flex-grow: 1; background: transparent; border: none; color: white; outline: none; 
+            resize: none; font-size: 16px; padding: 8px 0; margin: 0; line-height: 20px;
+            max-height: 150px; overflow-y: hidden;
+        }
+
+        .send-btn { background: var(--whatsapp-green); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 
         /* Login UI */
-        #loginArea { max-width: 350px; margin: 100px auto; background: #161e2d; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #2d3748; }
-        .login-input { padding: 12px; width: 90%; border: 1px solid #334155; border-radius: 8px; margin-bottom: 12px; background: #0b0f19; color: white; outline: none; }
+        #loginArea { max-width: 320px; margin: 120px auto; background: #1c2533; padding: 40px 25px; border-radius: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-input { padding: 14px; width: 100%; border: 1px solid #334155; border-radius: 12px; margin-bottom: 15px; background: #0b0f19; color: white; outline: none; box-sizing: border-box; }
+        .login-btn { background: var(--blue); color: white; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -54,32 +96,34 @@
 
 <div id="selectionHeader">
     <div style="display:flex; align-items:center; gap:15px;">
-        <span onclick="cancelSelection()" style="cursor:pointer; font-size:20px;">✕</span>
+        <span onclick="cancelSelection()" style="cursor:pointer; font-size:22px;">✕</span>
         <span id="selectedCount" style="font-size:18px; font-weight:bold;">1</span>
     </div>
     <div onclick="deleteSelected()" style="cursor:pointer;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#ff4d4d"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
     </div>
 </div>
 
 <button id="circLogout" onclick="location.reload()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
 </button>
 
 <div id="loginArea">
-    <h2>CONFIDENTIAL</h2>
+    <h3 style="letter-spacing: 3px; margin-bottom: 25px; color: #94a3b8;">SECURE ACCESS</h3>
     <input type="text" id="userInp" class="login-input" placeholder="Username">
     <input type="password" id="passInp" class="login-input" placeholder="Password">
-    <button onclick="checkAuth()" style="background:var(--blue); color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:bold;">ENTER</button>
+    <button class="login-btn" onclick="checkAuth()">ENTER</button>
 </div>
 
 <div id="diaryArea" style="display:none;">
     <div id="displayArea"></div>
     <div id="inputSection">
         <div class="chat-container">
-            <textarea id="noteText" placeholder="Write..."></textarea>
+            <div class="input-wrapper">
+                <textarea id="noteText" placeholder="Write a note..." rows="1" oninput="autoGrow(this)"></textarea>
+            </div>
             <button class="send-btn" onclick="saveNote()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
         </div>
     </div>
@@ -101,27 +145,36 @@
         } else { alert("Access Denied!"); }
     }
 
+    function autoGrow(element) {
+        element.style.height = "5px";
+        element.style.height = (element.scrollHeight) + "px";
+        let inputHeight = document.getElementById("inputSection").offsetHeight;
+        document.getElementById("displayArea").style.paddingBottom = (inputHeight + 10) + "px";
+    }
+
     function loadEntries() {
         let data = JSON.parse(localStorage.getItem("5ujal_multi_v1") || "[]");
         let area = document.getElementById("displayArea");
         area.innerHTML = "";
         data.forEach(item => {
-            let decodedMsg = decodeURIComponent(escape(atob(item.msg))); 
+            let decodedMsg = "";
+            try { decodedMsg = decodeURIComponent(escape(atob(item.msg))); } catch(e) { decodedMsg = "Encrypted Message"; }
+            
             let div = document.createElement('div');
             div.className = 'entry';
             div.id = 'msg-' + item.id;
-            div.innerHTML = `<div class="msg-card">
-                <div>${decodedMsg}</div>
-                <span class="msg-info">${item.date} • ${item.time}</span>
-            </div>`;
+            div.innerHTML = `
+                <div class="msg-card">
+                    <div style="white-space: pre-wrap;">${decodedMsg}</div>
+                    <span class="msg-info">${item.date} • ${item.time}</span>
+                </div>`;
             
-            // Interaction logic
             div.onmousedown = div.ontouchstart = (e) => startPress(item.id);
             div.onmouseup = div.ontouchend = () => endPress();
             div.onclick = () => handleClick(item.id);
-            
             area.appendChild(div);
         });
+        area.scrollTop = 0;
     }
 
     function startPress(id) {
@@ -132,14 +185,8 @@
             if(window.navigator.vibrate) window.navigator.vibrate(40);
         }, 600);
     }
-
     function endPress() { clearTimeout(longPressTimer); }
-
-    function handleClick(id) {
-        if (isSelectionMode) {
-            toggleSelect(id);
-        }
-    }
+    function handleClick(id) { if (isSelectionMode) toggleSelect(id); }
 
     function toggleSelect(id) {
         const el = document.getElementById('msg-' + id);
@@ -150,10 +197,8 @@
             selectedIds.push(id);
             el.classList.add('selected');
         }
-        
-        if (selectedIds.length === 0) {
-            cancelSelection();
-        } else {
+        if (selectedIds.length === 0) cancelSelection();
+        else {
             document.getElementById('selectionHeader').style.display = 'flex';
             document.getElementById('selectedCount').innerText = selectedIds.length;
         }
@@ -163,11 +208,11 @@
         isSelectionMode = false;
         selectedIds = [];
         document.getElementById('selectionHeader').style.display = 'none';
-        loadEntries(); // Reset visuals
+        loadEntries();
     }
 
     function deleteSelected() {
-        if (confirm(`Delete ${selectedIds.length} messages?`)) {
+        if (confirm(`Delete ${selectedIds.length} notes?`)) {
             let data = JSON.parse(localStorage.getItem("5ujal_multi_v1") || "[]");
             data = data.filter(item => !selectedIds.includes(item.id));
             localStorage.setItem("5ujal_multi_v1", JSON.stringify(data));
@@ -176,23 +221,32 @@
     }
 
     function saveNote() {
-        let text = document.getElementById("noteText").value;
-        if(!text.trim()) return;
+        let input = document.getElementById("noteText");
+        let text = input.value.trim();
+        if(!text) return;
+
         let data = JSON.parse(localStorage.getItem("5ujal_multi_v1") || "[]");
         let now = new Date();
-        data.unshift({ id: Date.now(), msg: btoa(unescape(encodeURIComponent(text))), time: now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true }), date: now.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) });
+        data.unshift({ 
+            id: Date.now(), 
+            msg: btoa(unescape(encodeURIComponent(text))), 
+            time: now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true }), 
+            date: now.toLocaleDateString('en-IN', { day:'2-digit', month:'short' }) 
+        });
         localStorage.setItem("5ujal_multi_v1", JSON.stringify(data));
-        document.getElementById("noteText").value = "";
+        
+        input.value = "";
+        input.style.height = "auto";
         loadEntries();
     }
 
     // Snow animation
     const container = document.getElementById('snow-container');
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
         let flake = document.createElement('div');
         flake.className = 'snowflake'; flake.innerHTML = '❄';
         flake.style.left = Math.random() * 100 + 'vw';
-        flake.style.animationDuration = Math.random() * 3 + 2 + 's';
+        flake.style.animationDuration = Math.random() * 3 + 4 + 's';
         container.appendChild(flake);
     }
 </script>
